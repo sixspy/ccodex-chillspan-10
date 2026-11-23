@@ -57,6 +57,7 @@ createApp({
     const reconOne = ref(null);
     const proofOne = ref(null);
     const reconAllItems = ref([]);
+    const gapLedger = ref([]);
     const reconCode = ref("CK-HD-01");
     const proofCode = ref("TB-CK-HD-01-002");
 
@@ -83,7 +84,7 @@ createApp({
     });
     const excOpenForm = ref({ batch_id: 0, threshold: null, note: "" });
     const sealForm = ref({ batch_id: 0, manifest: "" });
-    const spectrumForm = ref({ batch_id: 0 });
+    const spectrumForm = ref({ batch_id: 0, mode: "formal" });
     const lineageForm = ref({
       from_batch_id: 1,
       to_batch_id: 2,
@@ -151,6 +152,16 @@ createApp({
     function shortText(t) {
       if (!t) return "";
       return String(t).slice(0, 48) + (String(t).length > 48 ? "…" : "");
+    }
+    function gapText(g) {
+      if (!g) return "—";
+      return g.uncleared
+        ? `差额未清（在批 ${g.active_batches}/配额 ${g.quota_batches}，差额 ${g.gap}）`
+        : `差额已清（在批 ${g.active_batches}/配额 ${g.quota_batches}）`;
+    }
+    function gapClass(g) {
+      if (!g) return "frozen";
+      return g.uncleared ? "fail" : "pass";
     }
 
     async function login() {
@@ -353,8 +364,11 @@ createApp({
     async function doSpectrum() {
       clearFlash();
       try {
-        const row = await api.spectrumExport({ batch_id: spectrumForm.value.batch_id });
-        flashOk(`温谱 ${row.export_ref}`);
+        const row = await api.spectrumExport({
+          batch_id: spectrumForm.value.batch_id,
+          mode: spectrumForm.value.mode,
+        });
+        flashOk(`温谱 ${row.export_ref} · ${row.status}`);
         await refresh();
       } catch (e) {
         flashErr(e);
@@ -395,6 +409,7 @@ createApp({
       try {
         const r = await api.reconcile();
         reconAllItems.value = r.items || [];
+        gapLedger.value = r.gap_ledger || [];
         flashOk("全仓对账已刷新");
       } catch (e) {
         flashErr(e);
@@ -477,6 +492,7 @@ createApp({
       reconOne,
       proofOne,
       reconAllItems,
+      gapLedger,
       reconCode,
       proofCode,
       chamberForm,
@@ -503,6 +519,8 @@ createApp({
       probeOnlineClass,
       excursionClass,
       shortText,
+      gapText,
+      gapClass,
       createChamber,
       loadChamberDetail,
       registerProbe,

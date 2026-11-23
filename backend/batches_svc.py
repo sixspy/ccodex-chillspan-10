@@ -9,6 +9,7 @@ from auth import AuthHeader, require_user, require_writer
 from db import connect, now_iso, write_audit
 from locks import release, require_lock
 from models import BatchIn
+from reconcile_svc import batch_gap
 from validators import summarize_points, validate_probe_online, validate_temp_point
 
 router = APIRouter(tags=["batches"])
@@ -49,6 +50,7 @@ def list_batches(authorization: AuthHeader = None, status: str | None = None):
         for r in rows:
             d = dict(r)
             d["temp_points"] = json.loads(d["temp_points"] or "[]")
+            d["gap"] = batch_gap(conn, int(r["id"]))
             items.append(d)
         return {"items": items}
 
@@ -80,6 +82,7 @@ def get_batch(batch_id: int, authorization: AuthHeader = None):
             "batch": data,
             "excursions": [dict(e) for e in exc],
             "seals": [dict(s) for s in seals],
+            "gap": batch_gap(conn, batch_id),
         }
 
 

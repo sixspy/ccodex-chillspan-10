@@ -46,6 +46,7 @@ class SealIn(BaseModel):
 
 class SpectrumIn(BaseModel):
     batch_id: int
+    mode: str = "formal"
 
 
 class LineageIn(BaseModel):

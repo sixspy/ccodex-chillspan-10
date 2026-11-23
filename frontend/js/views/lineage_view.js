@@ -9,7 +9,7 @@ export const lineageViewTemplate = `
   </div>
   <div class="actions"><button @click="addLineageEdge">登记血缘边</button></div>
   <table class="data-table">
-    <thead><tr><th>自</th><th>至</th><th>类型</th><th>说明</th><th>时间</th></tr></thead>
+    <thead><tr><th>自</th><th>至</th><th>类型</th><th>说明</th><th>时间</th><th>差额</th></tr></thead>
     <tbody>
       <tr v-for="e in lineageEdges" :key="e.id">
         <td>{{ e.from_code }}</td>
@@ -17,6 +17,7 @@ export const lineageViewTemplate = `
         <td>{{ e.edge_type }}</td>
         <td>{{ e.detail }}</td>
         <td>{{ e.created_at }}</td>
+        <td><span class="badge" :class="gapClass(e.gap)">{{ gapText(e.gap) }}</span></td>
       </tr>
     </tbody>
   </table>

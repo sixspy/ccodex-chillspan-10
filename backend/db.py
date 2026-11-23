@@ -125,6 +125,18 @@ CREATE TABLE IF NOT EXISTS spectrum_exports(
   created_at TEXT NOT NULL,
   FOREIGN KEY(batch_id) REFERENCES temp_batches(id)
 );
+CREATE TABLE IF NOT EXISTS recon_gap_ledger(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  batch_id INTEGER,
+  batch_code TEXT NOT NULL,
+  chamber_code TEXT NOT NULL,
+  day TEXT NOT NULL,
+  action TEXT NOT NULL,
+  status TEXT NOT NULL,
+  detail TEXT,
+  actor TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS lineage_edges(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   from_batch_id INTEGER NOT NULL,
